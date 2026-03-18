@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Study Hub — Ciclo del Dato & IA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0f11;
+  --bg2: #16181c;
+  --bg3: #1e2128;
+  --bg4: #252830;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8eaf0;
+  --text2: #8b909e;
+  --text3: #5a5f6e;
+  --accent: #00d4aa;
+  --accent2: #0099cc;
+  --accent3: #f59e0b;
+  --accent4: #a78bfa;
+  --red: #ef4444;
+  --green: #22c55e;
+  --font: 'Outfit', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --serif: 'DM Serif Display', serif;
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+::selection{background:rgba(0,212,170,0.25);color:var(--accent)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* LAYOUT */
+.shell{display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:1.5rem 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.main{flex:1;padding:2rem 2.5rem;max-width:960px;overflow-x:hidden}
+@media(max-width:700px){.sidebar{display:none}.main{padding:1rem}}
+
+/* SIDEBAR */
+.logo{padding:0 1.25rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.logo-title{font-family:var(--serif);font-size:18px;color:var(--accent);line-height:1.2}
+.logo-sub{font-size:11px;color:var(--text3);margin-top:3px;font-family:var(--mono)}
+.nav-group{padding:0 .75rem;margin-bottom:.25rem}
+.nav-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:.5rem .5rem .25rem}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:.55rem .75rem;border:none;background:transparent;color:var(--text2);border-radius:8px;cursor:pointer;font-size:13px;font-family:var(--font);text-align:left;transition:all .15s}
+.nav-btn:hover{background:var(--bg3);color:var(--text)}
+.nav-btn.active{background:rgba(0,212,170,0.1);color:var(--accent);font-weight:500}
+.nav-btn .icon{width:16px;height:16px;opacity:.7;flex-shrink:0;font-size:14px}
+.nav-btn.active .icon{opacity:1}
+.streak-sidebar{margin:auto 0 0;padding:1rem 1.25rem 0;border-top:1px solid var(--border)}
+.streak-s{display:flex;align-items:center;gap:8px}
+.streak-num-s{font-family:var(--mono);font-size:22px;color:var(--accent3);font-weight:500}
+.streak-meta{font-size:11px;color:var(--text3);line-height:1.4}
+
+/* HEADER */
+.page-header{margin-bottom:2rem}
+.page-title{font-family:var(--serif);font-size:32px;color:var(--text);line-height:1.2;margin-bottom:.25rem}
+.page-sub{font-size:14px;color:var(--text2)}
+.top-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:2rem}
+@media(max-width:600px){.top-stats{grid-template-columns:repeat(2,1fr)}}
+.stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.1rem}
+.stat-n{font-family:var(--mono);font-size:24px;font-weight:500;color:var(--text);margin-bottom:2px}
+.stat-l{font-size:11px;color:var(--text3)}
+.prog-wrap{margin-bottom:2rem}
+.prog-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px;font-family:var(--mono)}
+.prog-track{height:4px;background:var(--bg3);border-radius:999px;overflow:hidden}
+.prog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* TABS MOBILE */
+.mobile-tabs{display:none;gap:4px;overflow-x:auto;scrollbar-width:none;margin-bottom:1.5rem;padding-bottom:2px}
+@media(max-width:700px){.mobile-tabs{display:flex}}
+.mob-tab{font-size:12px;padding:6px 13px;border:1px solid var(--border2);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;font-family:var(--font)}
+.mob-tab.active{background:rgba(0,212,170,0.12);border-color:var(--accent);color:var(--accent)}
+
+/* SEARCH & FILTERS */
+.search-row{display:flex;gap:8px;margin-bottom:12px}
+.search-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 14px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;transition:border .15s}
+.search-input::placeholder{color:var(--text3)}
+.search-input:focus{border-color:var(--accent)}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem}
+.fchip{font-size:11px;padding:4px 12px;border:1px solid var(--border2);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.fchip:hover{color:var(--text);border-color:rgba(255,255,255,0.25)}
+.fchip.on{background:rgba(0,212,170,0.15);border-color:var(--accent);color:var(--accent)}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.4rem 1.6rem;margin-bottom:1rem;transition:border .2s}
+.card:hover{border-color:var(--border2)}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:.8rem}
+.c-title{font-size:18px;font-weight:600;color:var(--text);line-height:1.25}
+.c-tag{font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:5px;white-space:nowrap;flex-shrink:0;font-weight:500;border:1px solid transparent}
+.tag-arq{background:rgba(0,212,170,0.1);color:var(--accent);border-color:rgba(0,212,170,0.2)}
+.tag-pipe{background:rgba(0,153,204,0.1);color:var(--accent2);border-color:rgba(0,153,204,0.2)}
+.tag-dev{background:rgba(167,139,250,0.1);color:var(--accent4);border-color:rgba(167,139,250,0.2)}
+.tag-cal{background:rgba(245,158,11,0.1);color:var(--accent3);border-color:rgba(245,158,11,0.2)}
+.tag-big{background:rgba(239,68,68,0.1);color:#f87171;border-color:rgba(239,68,68,0.2)}
+.tag-cloud{background:rgba(96,165,250,0.1);color:#60a5fa;border-color:rgba(96,165,250,0.2)}
+.tag-gov{background:rgba(52,211,153,0.1);color:#34d399;border-color:rgba(52,211,153,0.2)}
+.tag-ia{background:rgba(236,72,153,0.1);color:#f472b6;border-color:rgba(236,72,153,0.2)}
+.tag-leg{background:rgba(251,191,36,0.1);color:#fbbf24;border-color:rgba(251,191,36,0.2)}
+.tag-dato{background:rgba(134,239,172,0.1);color:#86efac;border-color:rgba(134,239,172,0.2)}
+
+.analogy{font-size:13px;color:var(--text2);font-style:italic;padding:8px 12px;border-left:2px solid rgba(0,212,170,0.4);margin-bottom:.8rem;line-height:1.55;background:rgba(0,212,170,0.04);border-radius:0 6px 6px 0}
+.c-def{font-size:13px;color:var(--text);line-height:1.7;margin-bottom:.8rem}
+.sec-label{font-size:10px;font-family:var(--mono);font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.c-example{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:.8rem;padding:10px 13px;background:var(--bg3);border-radius:8px}
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.8rem}
+@media(max-width:500px){.vs-grid{grid-template-columns:1fr}}
+.vs-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.vs-t{font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px}
+.vs-b{font-size:12px;color:var(--text2);line-height:1.55}
+.who-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:.8rem}
+.who-t{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.who-row{display:flex;flex-wrap:wrap;gap:5px}
+.who-chip{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid transparent;font-family:var(--mono)}
+.sen-jr{background:rgba(134,239,172,0.08);border-color:rgba(134,239,172,0.2);color:#86efac}
+.sen-mid{background:rgba(96,165,250,0.08);border-color:rgba(96,165,250,0.2);color:#60a5fa}
+.sen-sr{background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.2);color:var(--accent4)}
+.sen-lead{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.2);color:var(--accent3)}
+.reg-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:.8rem}
+.reg-chip{font-size:10px;padding:2px 8px;border-radius:5px;font-family:var(--mono)}
+.chip-eu{background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.2)}
+.chip-co{background:rgba(245,158,11,0.1);color:var(--accent3);border:1px solid rgba(245,158,11,0.2)}
+.card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:.8rem;border-top:1px solid var(--border);margin-top:.8rem}
+.mastery-wrap{display:flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--border2);background:transparent;cursor:pointer;transition:all .2s;display:inline-block}
+.dot.filled{background:var(--accent);border-color:var(--accent);box-shadow:0 0 6px rgba(0,212,170,0.4)}
+.m-lbl{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.quiz-btn{font-size:12px;padding:5px 14px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.quiz-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+
+/* QUIZ */
+.quiz-panel{margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--border);display:none}
+.quiz-q{font-size:13px;font-weight:500;color:var(--text);margin-bottom:.7rem;line-height:1.5}
+.quiz-opts{display:flex;flex-direction:column;gap:5px}
+.qopt{font-size:13px;padding:9px 13px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text2);cursor:pointer;text-align:left;transition:all .15s;font-family:var(--font)}
+.qopt:hover:not(:disabled){border-color:var(--border2);color:var(--text);background:var(--bg4)}
+.qopt.correct{background:rgba(0,212,170,0.1);border-color:var(--accent);color:var(--accent)}
+.qopt.wrong{background:rgba(239,68,68,0.1);border-color:var(--red);color:#f87171}
+.qfb{font-size:12px;margin-top:8px;padding:10px 13px;border-radius:8px;display:none;line-height:1.6;font-family:var(--mono)}
+.fb-ok{background:rgba(0,212,170,0.08);color:var(--accent);border:1px solid rgba(0,212,170,0.2)}
+.fb-bad{background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+
+/* PROFILES */
+.prof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.prof-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.3rem 1.4rem}
+.prof-head{display:flex;align-items:center;gap:12px;margin-bottom:.9rem}
+.prof-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;font-family:var(--mono)}
+.prof-name{font-size:15px;font-weight:600;color:var(--text)}
+.prof-sub{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.prof-desc{font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:.9rem;padding:9px 11px;background:var(--bg3);border-radius:8px}
+.sen-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:.75rem}
+.sen-table th{font-size:10px;font-weight:500;color:var(--text3);text-align:left;padding:5px 7px;border-bottom:1px solid var(--border);font-family:var(--mono)}
+.sen-table td{padding:6px 7px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
+.sen-table tr:last-child td{border-bottom:none}
+.sal-col{color:var(--accent3);font-family:var(--mono);white-space:nowrap;font-size:10px}
+.task-col{color:var(--text2);font-size:10px}
+.tools-wrap{display:flex;gap:4px;flex-wrap:wrap}
+.tool-tag{font-size:10px;padding:2px 8px;border-radius:5px;background:var(--bg4);border:1px solid var(--border);color:var(--text3);font-family:var(--mono)}
+
+/* LEGISLACION */
+.leg-compare{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.4rem 1.6rem;margin-bottom:1rem}
+.leg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+@media(max-width:520px){.leg-grid{grid-template-columns:1fr}}
+.leg-box{background:var(--bg3);border-radius:8px;padding:1rem 1.1rem;border:1px solid var(--border)}
+.leg-box-title{font-size:13px;font-weight:600;margin-bottom:.4rem}
+.leg-box-body{font-size:12px;color:var(--text2);line-height:1.65}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px}
+.cmp-table th{font-size:11px;font-weight:500;padding:8px 10px;background:var(--bg3);text-align:left;border:1px solid var(--border)}
+.cmp-table td{padding:8px 10px;border:1px solid var(--border);line-height:1.5;color:var(--text2)}
+.cmp-table tr:nth-child(odd) td{background:rgba(255,255,255,0.02)}
+.eu-col{color:#60a5fa}
+.co-col{color:var(--accent3)}
+
+/* AI GEN */
+.aigen-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.4rem 1.6rem;margin-bottom:1rem}
+.ai-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ai-inp{flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-size:13px;font-family:var(--font);outline:none}
+.ai-inp:focus{border-color:var(--accent)}
+.gen-btn{font-size:13px;padding:9px 18px;border:1px solid rgba(0,212,170,0.4);border-radius:8px;background:rgba(0,212,170,0.08);color:var(--accent);cursor:pointer;font-family:var(--font);transition:all .15s}
+.gen-btn:hover{background:rgba(0,212,170,0.15)}
+.pill-row{display:flex;gap:5px;flex-wrap:wrap}
+.pill{font-size:11px;padding:4px 12px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.pill:hover{border-color:var(--border2);color:var(--text)}
+.loading-dots{display:inline-flex;gap:4px}
+.loading-dots span{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:bounce .9s infinite}
+.loading-dots span:nth-child(2){animation-delay:.18s}
+.loading-dots span:nth-child(3){animation-delay:.36s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.empty{text-align:center;padding:3rem;color:var(--text3);font-size:14px}
+
+/* SECTION INTRO */
+.sec-intro{margin-bottom:1.5rem;padding:1rem 1.3rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid var(--accent)}
+.sec-intro p{font-size:13px;color:var(--text2);line-height:1.65}
+
+/* MOBILE TOP BAR */
+.mobile-top{display:none;align-items:center;justify-content:space-between;padding:1rem;border-bottom:1px solid var(--border);background:var(--bg2);margin-bottom:1rem}
+@media(max-width:700px){.mobile-top{display:flex}}
+.mob-logo{font-family:var(--serif);font-size:16px;color:var(--accent)}
+.mob-streak{font-family:var(--mono);font-size:14px;color:var(--accent3)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-title">Data<br>Study Hub</div>
+    <div class="logo-sub">v2.0 · Colombia</div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Módulos</div>
+    <button class="nav-btn active" onclick="showSection('fichas')"><span class="icon">◈</span>Fichas de estudio</button>
+    <button class="nav-btn" onclick="showSection('perfiles')"><span class="icon">◉</span>Perfiles & Roles</button>
+    <button class="nav-btn" onclick="showSection('legislacion')"><span class="icon">◎</span>Legislación</button>
+    <button class="nav-btn" onclick="showSection('aigen')"><span class="icon">✦</span>Generar con IA</button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Filtros rápidos</div>
+    <button class="nav-btn" onclick="quickFilter('arq')"><span class="icon" style="font-size:10px">●</span>Arquitectura</button>
+    <button class="nav-btn" onclick="quickFilter('pipe')"><span class="icon" style="font-size:10px">●</span>Pipelines</button>
+    <button class="nav-btn" onclick="quickFilter('dev')"><span class="icon" style="font-size:10px">●</span>DevOps/MLOps</button>
+    <button class="nav-btn" onclick="quickFilter('big')"><span class="icon" style="font-size:10px">●</span>Big Data</button>
+    <button class="nav-btn" onclick="quickFilter('cloud')"><span class="icon" style="font-size:10px">●</span>Cloud</button>
+    <button class="nav-btn" onclick="quickFilter('ia')"><span class="icon" style="font-size:10px">●</span>IA / LLMs</button>
+    <button class="nav-btn" onclick="quickFilter('gov')"><span class="icon" style="font-size:10px">●</span>Gobernanza</button>
+    <button class="nav-btn" onclick="quickFilter('leg')"><span class="icon" style="font-size:10px">●</span>Legislación</button>
+    <button class="nav-btn" onclick="quickFilter('dato')"><span class="icon" style="font-size:10px">●</span>Ciclo del Dato</button>
+    <button class="nav-btn" onclick="quickFilter('cal')"><span class="icon" style="font-size:10px">●</span>Calidad</button>
+  </div>
+
+  <div class="streak-sidebar">
+    <div class="streak-s">
+      <span style="font-size:20px">🔥</span>
+      <span class="streak-num-s" id="snum">1</span>
+      <div class="streak-meta">días seguidos<br><span id="prog-mini" style="color:var(--accent)">0% dominado</span></div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="mobile-top">
+    <span class="mob-logo">Data Study Hub</span>
+    <span class="mob-streak">🔥 <span id="snum2">1</span></span>
+  </div>
+
+  <div class="mobile-tabs">
+    <button class="mob-tab active" onclick="showSection('fichas')">Fichas</button>
+    <button class="mob-tab" onclick="showSection('perfiles')">Perfiles</button>
+    <button class="mob-tab" onclick="showSection('legislacion')">Legislación</button>
+    <button class="mob-tab" onclick="showSection('aigen')">IA ↗</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="top-stats">
+    <div class="stat-box"><div class="stat-n" id="st">—</div><div class="stat-l">conceptos totales</div></div>
+    <div class="stat-box"><div class="stat-n" id="sl">0</div><div class="stat-l">dominados</div></div>
+    <div class="stat-box"><div class="stat-n" id="sq">0</div><div class="stat-l">quizzes correctos</div></div>
+    <div class="stat-box"><div class="stat-n" id="ss">1</div><div class="stat-l">racha de días</div></div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-meta"><span id="plbl">Cargando progreso...</span><span id="ppct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
+  </div>
+
+  <!-- SECTION: FICHAS -->
+  <div id="sec-fichas">
+    <div class="page-header">
+      <div class="page-title">Fichas de Estudio</div>
+      <div class="page-sub">Todos los conceptos del ecosistema de datos — con analogías, ejemplos colombianos y quizzes.</div>
+    </div>
+    <div class="search-row">
+      <input class="search-input" id="srch" placeholder="Buscar concepto, tecnología, perfil..." oninput="renderCards()">
+    </div>
+    <div class="filter-row" id="frow"></div>
+    <div id="cards-container"></div>
+  </div>
+
+  <!-- SECTION: PERFILES -->
+  <div id="sec-perfiles" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Perfiles & Roles</div>
+      <div class="page-sub">Qué hace cada perfil, qué herramientas usa y cuánto gana en Colombia según seniority.</div>
+    </div>
+    <div id="prof-grid" class="prof-grid"></div>
+  </div>
+
+  <!-- SECTION: LEGISLACION -->
+  <div id="sec-legislacion" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Marco Regulatorio</div>
+      <div class="page-sub">EU AI Act vs CONPES — comparativa, implicaciones y fichas de los niveles de riesgo.</div>
+    </div>
+    <div class="leg-compare">
+      <div class="card-head"><div class="c-title">EU AI Act vs CONPES Colombia</div></div>
+      <div class="leg-grid">
+        <div class="leg-box">
+          <div class="leg-box-title eu-col">🇪🇺 EU AI Act (2024)</div>
+          <div class="leg-box-body">Reglamento europeo vinculante vigente desde agosto 2024, con implementación gradual hasta 2026. Clasifica sistemas de IA por nivel de riesgo y aplica a cualquier empresa que opere o venda en la UE, sin importar su sede. Las multas pueden llegar a €35M o 7% de ingresos globales.</div>
+        </div>
+        <div class="leg-box">
+          <div class="leg-box-title co-col">🇨🇴 CONPES 3975 / 4023</div>
+          <div class="leg-box-body">Documentos de política pública (no ley) que orientan el desarrollo de IA en Colombia. El 3975 (2019) fue pionero en Latinoamérica. El 4023 lo actualiza. No son vinculantes como ley, pero dirigen la inversión estatal y regulación sectorial. Enfocados en adopción, no en control de riesgos.</div>
+        </div>
+      </div>
+      <table class="cmp-table">
+        <tr><th>Dimensión</th><th class="eu-col">EU AI Act</th><th class="co-col">CONPES Colombia</th></tr>
+        <tr><td>Naturaleza jurídica</td><td>Reglamento vinculante (ley)</td><td>Política pública orientativa</td></tr>
+        <tr><td>Objetivo central</td><td>Gestionar riesgos de la IA</td><td>Impulsar adopción y competitividad</td></tr>
+        <tr><td>Clasificación de riesgo</td><td>4 niveles formales</td><td>No clasifica por riesgo</td></tr>
+        <tr><td>Sanciones</td><td>Hasta €35M o 7% ventas globales</td><td>Sin sanciones directas</td></tr>
+        <tr><td>Datos personales</td><td>Integrado con GDPR (muy estricto)</td><td>Alineado con Ley 1581 (Habeas Data)</td></tr>
+        <tr><td>Transparencia algorítmica</td><td>Obligatoria en sistemas de alto riesgo</td><td>Principio recomendado</td></tr>
+        <tr><td>Supervisión humana</td><td>Requerida en alto riesgo</td><td>Lineamiento no vinculante</td></tr>
+        <tr><td>Sesgo algorítmico</td><td>Prueba obligatoria antes de despliegue</td><td>Sin mecanismo de control</td></tr>
+        <tr><td>Impacto en Colombia</td><td>Aplica si vendes/operas en la UE</td><td>Aplica a entidades del Estado</td></tr>
+      </table>
+    </div>
+    <div id="leg-cards-container"></div>
+  </div>
+
+  <!-- SECTION: AI GEN -->
+  <div id="sec-aigen" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Generar con IA</div>
+      <div class="page-sub">Claude genera una ficha completa con analogía, comparativa, perfiles y quiz para cualquier concepto.</div>
+    </div>
+    <div class="aigen-box">
+      <div class="ai-row">
+        <input class="ai-inp" id="aiinput" placeholder="Ej: Apache Kafka, Feature Store, Vector Database, Snowflake...">
+        <button class="gen-btn" onclick="generateCard()">Generar ficha ↗</button>
+      </div>
+      <div class="pill-row">
+        <button class="pill" onclick="setAI('Apache Kafka')">Kafka</button>
+        <button class="pill" onclick="setAI('dbt (data build tool)')">dbt</button>
+        <button class="pill" onclick="setAI('Feature Store')">Feature Store</button>
+        <button class="pill" onclick="setAI('Databricks')">Databricks</button>
+        <button class="pill" onclick="setAI('Vector Database')">Vector DB</button>
+        <button class="pill" onclick="setAI('MLOps')">MLOps</button>
+        <button class="pill" onclick="setAI('Data Mesh')">Data Mesh</button>
+        <button class="pill" onclick="setAI('Snowflake')">Snowflake</button>
+        <button class="pill" onclick="setAI('Apache Flink streaming')">Flink</button>
+        <button class="pill" onclick="setAI('Responsible AI')">Responsible AI</button>
+        <button class="pill" onclick="setAI('Data Contract')">Data Contract</button>
+        <button class="pill" onclick="setAI('Kubernetes para datos')">K8s Datos</button>
+      </div>
+    </div>
+    <div id="aires"></div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const CONCEPTS = [
+// CICLO DEL DATO
+{id:1,title:"Ciclo de Vida del Dato",tag:"dato",tagLabel:"Ciclo del Dato",
+ analogy:"Como el ciclo de vida de un producto: nace, crece, se usa y eventualmente se retira del mercado.",
+ def:"Conjunto de etapas por las que pasa un dato desde su creación o captura hasta su eliminación o archivado permanente: generación → almacenamiento → procesamiento → análisis → publicación/uso → archivado/destrucción. Cada etapa tiene responsables, tecnologías y regulaciones distintas.",
+ example:"En una ARL colombiana: el dato de accidente laboral nace en la app móvil del trabajador (generación), se guarda en S3 (almacenamiento), se limpia con dbt (procesamiento), se analiza en BigQuery (análisis), se publica en dashboard para el empleador (uso) y se elimina a los 20 años según Ley 1581 (destrucción).",
+ vs:[{title:"Dato sin ciclo gestionado",body:"Se acumula sin control. Nadie sabe qué tiene, dónde está, si es confiable o si hay que eliminarlo. Costo legal y de storage sin control."},{title:"Ciclo gestionado",body:"Cada dato tiene propietario, política de retención, clasificación de sensibilidad y proceso de eliminación documentado. Base de gobernanza y cumplimiento."}],
+ who:[{role:"Data Steward",sen:"Mid/Sr",chip:"sen-mid"},{role:"Data Architect",sen:"Sr/Lead",chip:"sen-sr"},{role:"CDO / Chief Data Officer",sen:"Lead",chip:"sen-lead"}],
+ reg:["EU AI Act: datos de entrenamiento deben tener ciclo documentado (Art. 10)","CONPES 3975: gestión del ciclo del dato como habilitador de IA en el Estado"],
+ quiz:{q:"¿Cuál es la etapa del ciclo de vida que más se descuida en organizaciones pequeñas?",opts:["Generación","Almacenamiento","Destrucción/archivado","Procesamiento"],correct:2,exp:"La destrucción y el archivado son las etapas más descuidadas. Las organizaciones guardan datos indefinidamente por miedo a 'necesitarlos luego', acumulando riesgo legal (Ley 1581, GDPR) y costo de almacenamiento innecesario."}},
+
+{id:2,title:"Dato vs Información vs Conocimiento",tag:"dato",tagLabel:"Ciclo del Dato",
+ analogy:"Los ingredientes crudos (dato) → el plato cocinado con receta (información) → saber cocinar bien cualquier plato (conocimiento).",
+ def:"Dato: hecho crudo sin contexto ('23'). Información: dato con contexto que genera significado ('temperatura 23°C en Bogotá hoy a las 3pm'). Conocimiento: información procesada y relacionada que permite tomar decisiones ('hace frío para esta época, lleva saco'). La pirámide DIKW agrega Sabiduría: aplicar el conocimiento con juicio.",
+ example:"Grupo Bancolombia: '1500000' es un dato. 'Saldo de cuenta ahorros a 15/03/2024: $1.500.000' es información. 'El cliente ha reducido su saldo 40% en 3 meses, perfil de riesgo de churn' es conocimiento que activa retención.",
+ vs:[{title:"Dato sin contexto",body:"Solo un número o texto. Sin fecha, lugar, unidad o fuente no sirve para nada. Costo de almacenamiento sin valor."},{title:"Información contextualizada",body:"El mismo dato con metadatos: quién, qué, cuándo, dónde, en qué unidad. Ahora tiene valor. Base para analítica y decisiones."}],
+ who:[{role:"Data Analyst",sen:"Jr/Mid",chip:"sen-jr"},{role:"Business Intelligence",sen:"Jr/Mid",chip:"sen-jr"},{role:"Data Scientist",sen:"Mid",chip:"sen-mid"}],
+ reg:["EU AI Act: exige calidad en datos de entrenamiento, no solo cantidad (Art. 10)","CONPES 4023: énfasis en pasar de datos a conocimiento para política pública basada en evidencia"],
+ quiz:{q:"¿Qué convierte un dato en información?",opts:["Almacenarlo en una base de datos relacional","Agregarle contexto: quién, qué, cuándo, dónde y en qué unidad","Procesarlo con un algoritmo de machine learning","Visualizarlo en un dashboard de Power BI"],correct:1,exp:"El contexto es lo que transforma un dato en información. '23' es un dato. '23°C en Bogotá el 15/03/2024 a las 3pm' es información — tiene unidad, lugar y tiempo que le dan significado."}},
+
+// ARQUITECTURA
+{id:3,title:"Data Lake",tag:"arq",tagLabel:"Arquitectura",
+ analogy:"Como un lago natural: entra agua de todos lados —ríos, lluvia, escorrentía— sin filtrar ni ordenar. Todo se acumula. Ordenar es tarea de después.",
+ def:"Repositorio centralizado que almacena datos en su formato nativo y crudo (estructurados, semiestructurados y no estructurados) a escala masiva y bajo costo. Usa el esquema al leer (schema-on-read), no al escribir. El riesgo de un Lake sin gobernanza es convertirse en 'data swamp' (pantano de datos). Tecnologías: AWS S3, Azure Data Lake Storage Gen2, Google Cloud Storage con Delta Lake o Iceberg.",
+ example:"Ecopetrol almacena en su Data Lake: lecturas JSON de sensores IoT de pozos petroleros, PDFs de contratos, imágenes satelitales de infraestructura y logs de sistemas SAP. Todo convive sin transformar en S3. Los Data Engineers deciden qué procesar y cuándo según la necesidad analítica.",
+ vs:[{title:"Data Lake (schema-on-read)",body:"Guarda todo en crudo. Flexible y barato. Sin gobernanza se vuelve pantano: nadie sabe qué hay ni si sirve. Ideal para ML y datos no estructurados."},{title:"Data Warehouse (schema-on-write)",body:"Solo entra dato limpio y estructurado. Más costoso. Alta confianza para BI y reportes. Menos flexible para exploración."}],
+ who:[{role:"Data Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Cloud Architect",sen:"Sr/Lead",chip:"sen-sr"},{role:"Data Architect",sen:"Sr/Lead",chip:"sen-sr"}],
+ reg:["EU AI Act: datos de entrenamiento en el Lake deben tener linaje documentado (Art. 10)","CONPES 3975: promueve infraestructura de datos en la nube para el Estado colombiano"],
+ quiz:{q:"¿Qué es un 'data swamp' y cómo se genera?",opts:["Un Data Lake muy grande con muchos datos estructurados","Un Data Lake sin gobernanza donde nadie sabe qué datos hay ni si son confiables","Un Data Warehouse mal optimizado con consultas lentas","Un pipeline de datos que procesa datos de forma incorrecta"],correct:1,exp:"Un data swamp es un Data Lake degradado por falta de gobernanza: sin catálogo de datos, sin propietarios, sin políticas de retención. Los datos llegan pero nadie sabe qué hay, si es confiable o cómo usarlo. El Lake prometía valor pero se convirtió en costo sin retorno."}},
+
+{id:4,title:"Data Warehouse",tag:"arq",tagLabel:"Arquitectura",
+ analogy:"Como una bodega empresarial bien organizada: todo catalogado, etiquetado y en su lugar. Para saber qué hay, basta buscar en el catálogo.",
+ def:"Base de datos analítica columnar optimizada para consultas complejas (OLAP) sobre datos históricos, estructurados y ya limpios. Define el esquema antes de insertar (schema-on-write). Usa modelo dimensional (estrella/copo de nieve) para máximo rendimiento en aggregaciones. Tecnologías líderes: Snowflake, Google BigQuery, Amazon Redshift, Azure Synapse Analytics.",
+ example:"El Grupo Éxito usa BigQuery como Data Warehouse: cada noche un pipeline ETL/ELT limpia las ventas de 600+ tiendas y las carga al DW. Los analistas consultan con SQL estándar y obtienen reportes de ventas por categoría, región y temporada en segundos, sin afectar los sistemas transaccionales.",
+ vs:[{title:"OLTP — bases transaccionales",body:"Muchas escrituras pequeñas y rápidas. Alta concurrencia. Ej: PostgreSQL de una app. No apto para aggregar millones de filas."},{title:"OLAP — Data Warehouse",body:"Pocas escrituras, muchas lecturas complejas. Columnar: lee solo las columnas necesarias. Ideal para sumar, promediar, agrupar millones de registros."}],
+ who:[{role:"Data Engineer",sen:"Jr/Mid/Sr",chip:"sen-mid"},{role:"Analytics Engineer",sen:"Mid",chip:"sen-mid"},{role:"BI Developer",sen:"Jr/Mid",chip:"sen-jr"},{role:"Data Analyst",sen:"Jr/Mid",chip:"sen-jr"}],
+ reg:["EU AI Act: el DW es fuente de datos de entrenamiento — debe documentarse el linaje de cada tabla","CONPES 4023: el Estado colombiano prioriza DW modernos para datos abiertos (DANE, DNP, DIAN)"],
+ quiz:{q:"¿Por qué los Data Warehouses usan almacenamiento columnar en lugar de filas?",opts:["Para ahorrar espacio en disco duro","Porque las consultas analíticas suelen necesitar pocas columnas de muchas filas — leer solo esas columnas es mucho más rápido","Para facilitar las inserciones y actualizaciones de registros","Porque el SQL no funciona con almacenamiento por filas"],correct:1,exp:"En analítica, una consulta típica es 'suma las ventas de toda la columna X del último año'. Columnar lee solo esa columna, no todas las filas completas. En 100 millones de registros con 50 columnas, columnar puede ser 50x más rápido que row-based para aggregaciones."}},
+
+{id:5,title:"Data Lakehouse",tag:"arq",tagLabel:"Arquitectura",
+ analogy:"Como un gimnasio-spa de última generación: tiene la potencia del gimnasio (datos crudos, pesados) y el refinamiento del spa (tratamientos estructurados). Un solo lugar para ambas cosas.",
+ def:"Arquitectura que unifica las capacidades del Data Lake (flexibilidad, bajo costo, datos crudos) con las del Data Warehouse (transacciones ACID, rendimiento analítico, esquema). Se implementa con formatos de tabla abiertos: Delta Lake (Databricks), Apache Iceberg (Netflix, Apple) o Apache Hudi (Uber). Elimina la necesidad de copiar datos entre Lake y DW.",
+ example:"Rappi migró a Lakehouse sobre Databricks: almacena eventos de app en crudo en S3 (Lake), aplica Delta Lake para ACID y versionado (Lakehouse), y los analistas consultan con SQL como si fuera un DW. Un solo stack reemplazó tres sistemas separados, reduciendo latencia de datos de 8 horas a 15 minutos.",
+ vs:[{title:"Lake + DW por separado",body:"Doble infraestructura, doble costo operativo. Sincronización compleja y latencia entre sistemas. Datos desincronizados generan inconsistencias."},{title:"Lakehouse unificado",body:"Un sistema, menor costo, datos frescos más rápido. Delta Lake agrega ACID, time travel y schema enforcement sobre el Lake. Curva de aprendizaje mayor."}],
+ who:[{role:"Data Architect",sen:"Sr/Lead",chip:"sen-sr"},{role:"Data Engineer",sen:"Sr",chip:"sen-sr"},{role:"Platform Engineer",sen:"Sr/Lead",chip:"sen-sr"}],
+ reg:["EU AI Act: Delta Lake provee versionado nativo de datos — facilita cumplimiento de trazabilidad (Art. 12)","CONPES 3975: arquitecturas Lakehouse en la nube alineadas con transformación digital del Estado"],
+ quiz:{q:"¿Qué son las 'transacciones ACID' en el contexto de un Lakehouse?",opts:["Un tipo de formato de compresión de archivos en la nube","Garantías de que las operaciones de datos son atómicas, consistentes, aisladas y durables — como en una base de datos tradicional","Un protocolo de seguridad para cifrar datos en reposo","El nombre de un framework de orquestación de pipelines"],correct:1,exp:"ACID = Atomicity, Consistency, Isolation, Durability. Garantiza que si un pipeline falla a mitad de una escritura, los datos quedan consistentes (no a medias). Sin ACID, un fallo a mitad de una carga puede corromper el dataset. Delta Lake lleva ACID al mundo de los archivos en la nube."}},
+
+// PIPELINES
+{id:6,title:"ETL vs ELT",tag:"pipe",tagLabel:"Pipelines",
+ analogy:"ETL: cocinas los ingredientes en tu casa antes de llevarlos al restaurante. ELT: llevas los ingredientes crudos al restaurante —que tiene una cocina industrial mucho mejor que la tuya— y cocinas allá.",
+ def:"ETL (Extract→Transform→Load): transforma en servidor intermedio antes de cargar al destino. Paradigma clásico (años 90-2010). ELT (Extract→Load→Transform): carga datos crudos directamente al DW o Lake y transforma allí aprovechando su cómputo masivo. Paradigma moderno con DW cloud. ELT habilitó herramientas como dbt. Herramientas ETL: Informatica, SSIS, Talend. ELT: dbt, Fivetran, Airbyte + SQL en el DW.",
+ example:"Banco de Bogotá con ETL legacy: servidor Informatica dedicado limpia y valida cada transacción antes de cargarla al DW. Proceso: 6 horas por noche, difícil de escalar. Migración a ELT con BigQuery + dbt: carga todo en crudo en 20 minutos, transforma con SQL masivo en 40 minutos. Pipeline 4x más rápido y mantenible como código.",
+ vs:[{title:"ETL clásico",body:"Transforma antes de cargar. Requiere servidor de transformación separado. Más control de privacidad (datos sensibles nunca llegan al DW). Difícil de escalar."},{title:"ELT moderno",body:"Transforma en el destino. El DW cloud es el motor de transformación. SQL es el lenguaje de transformación. Pipelines como código (dbt). Más ágil."}],
+ who:[{role:"Data Engineer",sen:"Jr/Mid/Sr",chip:"sen-mid"},{role:"Analytics Engineer",sen:"Mid",chip:"sen-mid"},{role:"ETL Developer (legacy)",sen:"Jr/Mid",chip:"sen-jr"}],
+ reg:["EU AI Act: transformaciones deben documentarse para garantizar trazabilidad del dato (Art. 12)","CONPES: pipelines de datos públicos deben garantizar integridad — ELT con dbt provee documentación automática"],
+ quiz:{q:"¿Cuál es la ventaja principal de ELT sobre ETL para un equipo moderno de Analytics Engineering?",opts:["ELT es más barato en todos los escenarios","Las transformaciones en ELT se escriben en SQL, son versionables en Git y documentables con herramientas como dbt","ELT procesa datos más rápido porque no hace transformaciones","ELT no requiere conocimientos técnicos"],correct:1,exp:"En ELT moderno (con dbt), las transformaciones son SQL puro versionado en Git: cada transformación tiene tests, documentación y linaje visual automático. El Analytics Engineer puede trabajar de forma autónoma sin depender del equipo de infraestructura para cada cambio."}},
+
+{id:7,title:"Pipeline de Datos & Orquestación",tag:"pipe",tagLabel:"Pipelines",
+ analogy:"Como una línea de ensamblaje: cada estación hace su trabajo y pasa al siguiente. El director de orquesta (Airflow/Prefect) decide quién trabaja cuándo y qué pasa si alguien falla.",
+ def:"Pipeline: secuencia automatizada de procesos que mueven y transforman datos (extracción → validación → transformación → carga → notificación). La orquestación gestiona dependencias, reintentos, alertas y scheduling de múltiples pipelines. Apache Airflow define flujos como código Python (DAGs). Alternativas modernas: Prefect, Dagster, Mage. Tipos: batch (por lotes, cada N horas) o streaming (evento por evento, en ms).",
+ example:"Telefónica Colombia: Airflow orquesta 200+ DAGs. A las 2am extrae datos del CRM Salesforce, a las 3am valida con Great Expectations, a las 4am carga al DW BigQuery, a las 5am ejecuta modelos de churn en Vertex AI. Si el DAG de validación falla, Airflow detiene todo, reintenta 3 veces y manda alerta a Slack. Sin orquestación: cron jobs descoordinados con fallos silenciosos.",
+ vs:[{title:"Batch pipeline",body:"Procesa lotes en intervalos fijos (hora, noche). Más simple y barato. Ej: reporte diario de ventas. Herramientas: Airflow, dbt, cron."},{title:"Streaming pipeline",body:"Procesa evento por evento en tiempo real (milisegundos). Más complejo y costoso. Ej: detección de fraude, inventario en vivo. Herramientas: Kafka, Flink, Spark Streaming."}],
+ who:[{role:"Data Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"DataOps Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Streaming Engineer",sen:"Sr/Lead",chip:"sen-sr"}],
+ reg:["EU AI Act: pipelines que alimentan modelos de alto riesgo deben auditarse y monitorearse (Art. 17)","CONPES: interoperabilidad de sistemas del Estado depende de pipelines robustos y documentados"],
+ quiz:{q:"¿Qué es un DAG en Apache Airflow y por qué 'acyclic' (sin ciclos) es importante?",opts:["Un tipo de base de datos para pipelines de datos en tiempo real","Un gráfico de tareas con dependencias donde no hay ciclos — garantiza que el pipeline siempre termina","Un lenguaje de consulta alternativo a SQL para transformaciones","Un contenedor Docker especializado para pipelines de datos"],correct:1,exp:"DAG = Directed Acyclic Graph. Directed = las dependencias tienen dirección (A→B, no B→A simultáneamente). Acyclic = sin ciclos = el pipeline no puede entrar en un bucle infinito. Si A depende de B y B depende de A, el pipeline nunca terminaría. El 'sin ciclos' garantiza terminación."}},
+
+// DEVOPS / MLOPS
+{id:8,title:"CI/CD para Datos y ML",tag:"dev",tagLabel:"DevOps/MLOps",
+ analogy:"Como el control de calidad automático en una fábrica: cada pieza se prueba antes de montarse. Si falla la prueba, la línea se detiene antes de ensamblar un producto defectuoso.",
+ def:"CI (Continuous Integration): cada cambio de código se integra al repositorio y dispara pruebas automáticas (unitarias, de integración, de calidad de datos). CD (Continuous Delivery/Deployment): si las pruebas pasan, el código se despliega automáticamente a staging o producción. En datos aplica a pipelines, transformaciones dbt, modelos ML y esquemas de bases de datos. Herramientas: GitHub Actions, GitLab CI, Jenkins, CircleCI, dbt Cloud.",
+ example:"Equipo de datos de Bancolombia: un Analytics Engineer modifica una transformación SQL en dbt. GitHub Actions ejecuta: pruebas de schema (columnas esperadas), pruebas de datos (no nulos, valores únicos), y si todo pasa, despliega a producción en BigQuery en 12 minutos. Sin CI/CD el mismo proceso tomaba 1 día de coordinación manual y revisiones.",
+ vs:[{title:"Sin CI/CD (manual)",body:"Despliegues manuales y error-prone. 'Funciona en mi máquina'. Difícil revertir errores. Equipos bloqueados esperando aprobaciones. Inconsistencias entre entornos."},{title:"Con CI/CD automatizado",body:"Cada cambio probado antes de producción. Rollback en segundos (git revert). Equipos despliegan decenas de veces/día. Auditoría completa de qué cambió, quién y cuándo."}],
+ who:[{role:"DevOps/DataOps Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Data Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"ML Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Analytics Engineer",sen:"Mid",chip:"sen-mid"}],
+ reg:["EU AI Act: sistemas de IA de alto riesgo requieren control de versiones y auditoría de cambios — CI/CD automatiza esto (Art. 12, 17)","CONPES 4023: MINSALUD y DIAN implementan CI/CD en sus plataformas de datos como buena práctica"],
+ quiz:{q:"En el contexto de dbt con CI/CD, ¿qué verifica una 'prueba de datos' (data test)?",opts:["Que el código Python compile sin errores de sintaxis","Que los datos cumplan reglas de negocio: no nulos, unicidad, valores esperados, relaciones entre tablas","Que el pipeline se ejecute en menos de 10 minutos","Que la documentación del modelo esté completa y actualizada"],correct:1,exp:"Las data tests en dbt verifican la calidad del dato resultado: que la columna 'cliente_id' no tenga nulos, que sea única, que todos los valores de 'país' estén en una lista válida, que las claves foráneas referencien registros existentes. Son la 'red de seguridad' que garantiza que el dato llegue correcto al DW."}},
+
+{id:9,title:"Docker & Kubernetes",tag:"dev",tagLabel:"DevOps/MLOps",
+ analogy:"Docker es el contenedor de carga marítimo: empaqueta todo lo necesario para el viaje. Kubernetes es el puerto que gestiona miles de contenedores: dónde va cada uno, qué pasa si uno se cae, cómo escalar.",
+ def:"Docker empaqueta una aplicación con todas sus dependencias (Python 3.11, librerías, configuraciones) en una imagen reproducible que corre igual en cualquier máquina. Kubernetes (K8s) orquesta múltiples contenedores: auto-scaling, self-healing, load balancing y despliegues sin downtime. En datos: Airflow, Spark, modelos ML y APIs de inferencia corren en contenedores gestionados por K8s.",
+ example:"Un Data Scientist de Falabella Colombia entrena un modelo de recomendación en su laptop con Python 3.11 + scikit-learn 1.4. Sin Docker: al desplegarlo en el servidor de producción falla por diferencias de versiones. Con Docker: el mismo contenedor corre igual en laptop, CI/CD y producción. Kubernetes escala automáticamente el servicio de inferencia de 2 a 20 réplicas en Black Friday.",
+ vs:[{title:"Sin contenedores (VMs tradicionales)",body:"'Funciona en mi máquina'. Configurar cada servidor es manual. VMs son pesadas (GBs). Escalar tarda días. Deuda técnica de entornos desincronizados."},{title:"Con Docker + Kubernetes",body:"Reproducibilidad total. Contenedores son livianos (MBs). Escala en segundos. Rollback automático. Estándar en ingeniería de datos moderna y MLOps."}],
+ who:[{role:"Platform/DevOps Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"ML Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Data Engineer",sen:"Mid",chip:"sen-mid"}],
+ reg:["EU AI Act: los sistemas de IA requieren documentación del entorno de ejecución — Docker garantiza reproducibilidad (Art. 11)","CONPES 3975: infraestructura del Estado colombiano avanza hacia contenedores (MinHacienda, DNP)"],
+ quiz:{q:"¿Por qué es importante Docker para el cumplimiento del EU AI Act en sistemas de IA de alto riesgo?",opts:["Porque Docker hace los modelos de IA más precisos","Porque Docker garantiza que el entorno de ejecución del modelo sea reproducible y documentable — requisito de trazabilidad","Porque Docker es más barato que las máquinas virtuales tradicionales","Porque el EU AI Act específicamente menciona Docker como herramienta requerida"],correct:1,exp:"El EU AI Act exige documentar el entorno técnico de sistemas de IA de alto riesgo. Docker garantiza reproducibilidad: el mismo contenedor (con la misma versión de Python, librerías y configuraciones) puede reconstruirse en cualquier momento para auditoría. Sin Docker, probar que el modelo corrió exactamente igual en un momento pasado es casi imposible."}},
+
+// BIG DATA
+{id:10,title:"Big Data — Las 5 V",tag:"big",tagLabel:"Big Data",
+ analogy:"Como un río Amazonas de datos: no es solo enorme en volumen, sino que fluye rápido, viene de miles de afluentes distintos, no siempre es limpio y su valor hay que extraerlo activamente.",
+ def:"Big Data describe datos que superan la capacidad de herramientas convencionales por sus características. Las 5 V: Volumen (terabytes a petabytes), Velocidad (generación y procesamiento en tiempo real), Variedad (estructurados, semi y no estructurados), Veracidad (calidad y confiabilidad variable) y Valor (el dato solo importa si genera insights accionables). Tecnologías: Apache Spark, Hadoop, Flink.",
+ example:"Claro Colombia procesa Big Data: 50TB diarios de registros de llamadas (Volumen), en tiempo real para detección de fraude (Velocidad), desde redes, apps y CRM en JSON, CSV y binario (Variedad), con registros corruptos y duplicados frecuentes (Veracidad). El valor: reducir churn un 15% y fraude un 40% con modelos predictivos.",
+ vs:[{title:"Datos convencionales",body:"Caben en Excel o una DB relacional. Una sola máquina los procesa. Estructurados y limpios. SQL estándar es suficiente."},{title:"Big Data",body:"Requieren procesamiento distribuido (Spark). Múltiples máquinas en paralelo. Variedad de formatos. Latencia y calidad variables. Infraestructura especializada."}],
+ who:[{role:"Data Engineer (Big Data)",sen:"Sr",chip:"sen-sr"},{role:"Big Data Architect",sen:"Sr/Lead",chip:"sen-sr"},{role:"Data Scientist (ML a escala)",sen:"Sr",chip:"sen-sr"}],
+ reg:["EU AI Act: datos masivos de entrenamiento caen bajo Big Data — requisitos de calidad y representatividad (Art. 10)","CONPES 3975: Big Data como habilitador estratégico de IA en Colombia — Plan Nacional de Big Data"],
+ quiz:{q:"¿Por qué Apache Spark es la herramienta estándar para Big Data en lugar de SQL tradicional?",opts:["Porque Spark usa un lenguaje más fácil que SQL","Porque Spark distribuye el procesamiento en un clúster de máquinas en paralelo — puede procesar petabytes que no caben en una sola máquina","Porque Spark es gratis y las bases de datos SQL son de pago","Porque Spark no requiere conocimientos técnicos para usarlo"],correct:1,exp:"Spark distribuye los datos y el cómputo en decenas o cientos de máquinas trabajando en paralelo (MapReduce evolucionado). Una sola máquina con 256GB RAM no puede procesar 50TB. Spark divide esos 50TB en particiones de 128MB, las distribuye en 400 máquinas y las procesa en paralelo — lo que tomaría días se hace en minutos."}},
+
+{id:11,title:"Apache Spark",tag:"big",tagLabel:"Big Data",
+ analogy:"Como una empresa con 400 empleados trabajando en paralelo en el mismo proyecto: cada uno procesa su parte y al final se consolida el resultado. Un solo empleado haría lo mismo, pero en 400 veces más tiempo.",
+ def:"Motor de procesamiento distribuido de datos en memoria (in-memory), hasta 100x más rápido que Hadoop MapReduce para ciertos casos. Soporta batch, streaming, SQL, ML (MLlib) y graph processing en un solo framework. APIs en Python (PySpark), Scala y Java. Se ejecuta en clusters (Databricks, EMR, Dataproc) o en modo local para desarrollo.",
+ example:"Nu Colombia usa PySpark en Databricks para calcular el score de riesgo crediticio de 8 millones de clientes cada noche: cruza historial de pagos, comportamiento de app, variables macroeconómicas y datos bureaux. Sin Spark (con pandas): 14 horas de procesamiento. Con Spark en cluster de 50 nodos: 22 minutos.",
+ vs:[{title:"Pandas (una máquina)",body:"Ideal para datos que caben en RAM (hasta ~10GB). Simple y rápido de desarrollar. No escala a Big Data. El estándar para Data Science exploratoria."},{title:"PySpark (distribuido)",body:"Para datos que no caben en una máquina (>50GB). Misma API que pandas pero distribuida. Más complejo de debuggear. El estándar para ingeniería de datos a escala."}],
+ who:[{role:"Data Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Data Scientist (escala)",sen:"Sr",chip:"sen-sr"},{role:"Big Data Engineer",sen:"Sr/Lead",chip:"sen-sr"}],
+ reg:["EU AI Act: Spark es tecnología habilitadora — los datos que procesa para entrenamiento siguen sujetos a Art. 10","CONPES 3975: Spark mencionado como tecnología estratégica para procesamiento de datos gubernamentales"],
+ quiz:{q:"¿Cuándo tiene sentido migrar de pandas a PySpark en un proyecto de datos?",opts:["Cuando el dataset supera 1MB","Cuando el dataset no cabe cómodamente en la RAM de una máquina (generalmente >10-50GB) o cuando el tiempo de procesamiento es inaceptable","Cuando el equipo tiene más de 5 personas","Cuando se trabaja con datos de texto en lugar de números"],correct:1,exp:"La regla práctica: si pandas tarda más de lo aceptable o el dataset no cabe en RAM, es momento de Spark. La migración tiene un costo (aprendizaje, infraestructura, debugging más complejo), así que no tiene sentido para datasets pequeños. El límite aproximado está entre 10GB y 50GB dependiendo de la RAM disponible."}},
+
+// CLOUD
+{id:12,title:"Cloud Computing para Datos",tag:"cloud",tagLabel:"Cloud",
+ analogy:"Como pasar de tener tu propio generador eléctrico a conectarte a la red eléctrica: no compras, mantienes ni reparas — solo consumes lo que necesitas y pagas por uso.",
+ def:"Los tres grandes proveedores cloud (AWS, Azure, GCP) ofrecen infraestructura bajo demanda (IaaS), plataformas gestionadas (PaaS) y servicios de datos completos sin gestionar servidores. Modelos: IaaS (tú gestionas el SO y arriba), PaaS (el proveedor gestiona la plataforma, tú el código), SaaS (todo gestionado). Para datos: storage (S3/GCS/ADLS), cómputo (EC2/VM/GCE), DW (BigQuery/Redshift/Synapse), ML (SageMaker/Vertex/AzureML).",
+ example:"El DANE Colombia migró su infraestructura de datos al cloud de AWS: lo que antes requería comprar servidores físicos por $2B COP cada 4 años (y sufrir durante el censo), ahora escala automáticamente. Durante el Censo 2018, escalaron de 20 a 500 servidores en 2 horas para procesar 45 millones de formularios — imposible con infraestructura on-premise.",
+ vs:[{title:"On-premise (servidores propios)",body:"Control total. Inversión inicial alta (CapEx). Capacidad fija: si necesitas más, esperas meses. Ideal para datos muy sensibles con regulación estricta."},{title:"Cloud (bajo demanda)",body:"Pago por uso (OpEx). Escala en minutos. Sin gestión de hardware. Riesgo: vendor lock-in y costos inesperados si no se gestiona bien el uso."}],
+ who:[{role:"Cloud Data Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Cloud Architect",sen:"Sr/Lead",chip:"sen-sr"},{role:"FinOps Engineer",sen:"Mid/Sr",chip:"sen-mid"}],
+ reg:["EU AI Act: datos en la nube siguen sujetos a GDPR — la nube no exime de responsabilidad (Art. 10)","CONPES 3975: estrategia de adopción cloud para el Estado — lineamientos de seguridad y soberanía del dato"],
+ quiz:{q:"¿Qué es el 'vendor lock-in' en cloud y por qué es un riesgo?",opts:["Cuando el proveedor cloud tiene fallos de seguridad frecuentes","Cuando una organización depende tanto de servicios propietarios de un proveedor que migrar a otro es muy costoso y difícil","Cuando el costo de la nube supera el presupuesto asignado","Cuando los datos se pierden por fallos del proveedor cloud"],correct:1,exp:"Vendor lock-in ocurre cuando usas servicios muy propietarios (ej: DynamoDB de AWS, Bigtable de GCP) que no tienen equivalente en otros proveedores. Si AWS sube precios o tiene problemas, migrar a Azure o GCP requeriría reescribir toda la arquitectura. La mitigación: usar tecnologías abiertas (Spark, Kafka, Iceberg) que corren en cualquier nube."}},
+
+// GOBERNANZA
+{id:13,title:"Data Governance & Data Catalog",tag:"gov",tagLabel:"Gobernanza",
+ analogy:"Como las reglas de tránsito más el mapa de la ciudad: las reglas definen cómo moverse (gobernanza), el mapa dice dónde está todo y cómo llegar (catálogo).",
+ def:"La gobernanza del dato establece políticas, roles (Data Owner, Data Steward, Data Consumer) y procesos para gestionar datos de forma segura, confiable y conforme a regulaciones. El catálogo de datos (Data Catalog) es la herramienta que implementa la gobernanza: inventario de todos los activos de datos con metadatos, propietario, clasificación, linaje y términos de uso. Herramientas: Collibra, Alation, DataHub, Apache Atlas (open source).",
+ example:"Grupo Sura implementó Collibra como catálogo: cada analista puede buscar 'tabla de clientes' y encontrar quién la posee (dueño: área CRM), qué significa cada columna, si tiene datos PII, cuándo se actualizó por última vez y qué reportes la usan. Antes: preguntaban por Slack y nadie sabía. Ahora: autoservicio en 2 minutos.",
+ vs:[{title:"Sin catálogo (caos)",body:"Analistas preguntan por Slack '¿alguien sabe qué es la tabla dim_clientes_v2?'. Nadie sabe quién la creó. Desconfianza en los datos. Trabajo duplicado."},{title:"Con catálogo (autoservicio)",body:"Cada activo de datos documentado: descripción, propietario, clasificación PII, linaje, SLA de frescura. Los analistas son autosuficientes. Gobernanza escalable."}],
+ who:[{role:"Data Steward",sen:"Mid/Sr",chip:"sen-mid"},{role:"Data Governance Manager",sen:"Sr/Lead",chip:"sen-sr"},{role:"CDO / Chief Data Officer",sen:"Lead",chip:"sen-lead"},{role:"Data Engineer",sen:"Mid",chip:"sen-mid"}],
+ reg:["EU AI Act: catálogo de datos facilita cumplimiento — saber qué datos existen, dónde y con qué clasificación (Art. 10, 17)","CONPES 4023: el DAPRE lidera gobernanza del dato en el Estado — catálogo de datos abiertos como obligación"],
+ quiz:{q:"¿Cuál es la diferencia entre un Data Owner y un Data Steward?",opts:["Son el mismo rol con nombres diferentes","Data Owner: responsable de negocio que decide las políticas del dato. Data Steward: quien implementa operativamente esas políticas y garantiza calidad.","Data Owner es un rol técnico, Data Steward es un rol de negocio","Data Owner existe solo en empresas grandes, Data Steward en cualquier tamaño"],correct:1,exp:"Data Owner es el responsable de negocio: decide qué datos se recopilan, quién puede acceder y por cuánto tiempo. Data Steward es el ejecutor operativo: garantiza calidad, mantiene el catálogo actualizado, gestiona las solicitudes de acceso. Un CFO puede ser Data Owner del dato financiero; un analista senior es el Data Steward que lo gestiona día a día."}},
+
+// IA & LLMs
+{id:14,title:"Machine Learning — Tipos",tag:"ia",tagLabel:"IA / LLMs",
+ analogy:"Como diferentes formas de aprender: con ejemplos etiquetados (supervisado, como estudiar con respuestas), sin etiquetas (no supervisado, como explorar un país nuevo sin guía), o por prueba y error con recompensas (refuerzo, como aprender a manejar).",
+ def:"Supervised Learning: el modelo aprende de datos etiquetados (input→output conocido). Ej: clasificar emails como spam/no spam. Unsupervised Learning: encuentra patrones sin etiquetas. Ej: segmentación de clientes. Reinforcement Learning: aprende por recompensas/penalizaciones. Ej: AlphaGo. Self-supervised/Foundation Models: aprenden de grandes cantidades de datos sin etiquetas humanas. Base de los LLMs.",
+ example:"Compensar Familiar Colombia usa ML: supervisado para aprobar/rechazar solicitudes de subsidio (etiquetado: histórico de aprobaciones), no supervisado para segmentar familias en grupos de necesidad sin categorías predefinidas, y reinforcement learning en sus sistemas de recomendación de programas sociales.",
+ vs:[{title:"ML clásico (tabular)",body:"Árboles de decisión, XGBoost, regresión. Datos estructurados. Interpretable. Funciona bien con datos limitados. Rápido de entrenar."},{title:"Deep Learning",body:"Redes neuronales profundas. Datos masivos. Ideal para imágenes, texto, audio. Caja negra. Requiere mucho cómputo y datos."}],
+ who:[{role:"Data Scientist",sen:"Mid/Sr",chip:"sen-mid"},{role:"ML Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Research Scientist",sen:"Sr/Lead",chip:"sen-sr"}],
+ reg:["EU AI Act: sistemas de ML de alto riesgo deben documentar tipo de algoritmo, datos de entrenamiento y limitaciones (Art. 13)","CONPES 3975: ML como tecnología habilitadora de IA — COLCIENCIAS financia investigación en ML aplicado"],
+ quiz:{q:"¿Por qué el aprendizaje supervisado requiere datos etiquetados y qué riesgo implica?",opts:["No requiere datos etiquetados — eso es el no supervisado","Requiere que humanos etiqueten ejemplos (ej: marcar emails como spam). El riesgo: si las etiquetas tienen sesgo humano, el modelo aprenderá y amplificará ese sesgo","Requiere etiquetas pero solo para el conjunto de prueba, no de entrenamiento","Las etiquetas son generadas automáticamente por el modelo durante el entrenamiento"],correct:1,exp:"El modelo supervisado aprende a partir de ejemplos etiquetados por humanos. Si el equipo histórico aprobó más créditos a hombres que a mujeres (sesgo histórico), el modelo aprenderá ese patrón y lo reproducirá a escala. El EU AI Act exige evaluar y mitigar estos sesgos antes del despliegue en sistemas de alto riesgo."}},
+
+{id:15,title:"LLM — Large Language Models",tag:"ia",tagLabel:"IA / LLMs",
+ analogy:"Como un asistente que leyó toda la internet y aprendió a predecir la siguiente palabra perfectamente. Tan bien que parece entender y razonar.",
+ def:"Modelos de lenguaje entrenados en cantidades masivas de texto (billones de tokens) con arquitectura Transformer. Aprenden a predecir el siguiente token, pero emergen capacidades de razonamiento, traducción, código y análisis. Los más conocidos: GPT-4 (OpenAI), Claude (Anthropic), Gemini (Google), Llama (Meta, open source). Se distinguen por parámetros (tamaño), ventana de contexto y capacidades multimodales.",
+ example:"La Superintendencia de Industria y Comercio (SIC) de Colombia piloteó Claude para analizar 10.000 contratos de adhesión en busca de cláusulas abusivas. Tarea que tomaba 6 meses a 20 abogados: 72 horas con LLM + revisión humana de casos detectados. El LLM no reemplazó abogados, los hizo 40x más eficientes.",
+ vs:[{title:"LLM general (GPT-4, Claude)",body:"Conocimiento amplio pero no especializado. Sin datos privados de la empresa. Ideal para tareas generales: escritura, código, análisis de documentos."},{title:"LLM fine-tuned / RAG",body:"Adaptado al dominio específico o con acceso a documentos privados. Más preciso en su área. Requiere infraestructura adicional y cuidado con datos confidenciales."}],
+ who:[{role:"ML Engineer / LLMOps",sen:"Sr",chip:"sen-sr"},{role:"AI Product Manager",sen:"Mid/Sr",chip:"sen-mid"},{role:"Data Scientist (NLP)",sen:"Sr",chip:"sen-sr"},{role:"Prompt Engineer",sen:"Jr/Mid",chip:"sen-jr"}],
+ reg:["EU AI Act: LLMs de propósito general (GPAI) tienen obligaciones específicas de transparencia y evaluación de riesgos sistémicos (Art. 51-55)","CONPES 4023: menciona LLMs como tecnología emergente — sin regulación específica aún, vacío legal significativo en Colombia"],
+ quiz:{q:"¿Qué obligaciones tiene un proveedor de un LLM de propósito general bajo el EU AI Act?",opts:["Ninguna — los LLMs generales están exentos del EU AI Act","Publicar resumen de datos de entrenamiento, cumplir derechos de autor de la UE, y si tienen impacto sistémico: evaluación de riesgos y reporte de incidentes","Solo deben registrarse en la base de datos europea de IA","Las mismas obligaciones que cualquier software: documentación técnica básica"],correct:1,exp:"El EU AI Act (Art. 51-55) introduce una categoría específica para modelos de IA de propósito general (GPAI): deben publicar resumen de datos de entrenamiento, cumplir la ley de derechos de autor UE, y si se clasifican como de 'impacto sistémico' (los más potentes, ej: GPT-4, Claude Opus), además deben hacer evaluaciones de riesgos adversariales y reportar incidentes graves."}},
+
+{id:16,title:"RAG — Retrieval Augmented Generation",tag:"ia",tagLabel:"IA / LLMs",
+ analogy:"Como un abogado que, antes de responder, va a buscar el caso específico en la biblioteca de jurisprudencia. No responde de memoria (alucinaciones), primero busca evidencia relevante.",
+ def:"Técnica que mejora los LLMs conectándolos a una base de conocimiento externa: el sistema primero recupera documentos relevantes (Retrieval) y luego los incluye como contexto para que el LLM genere una respuesta basada en esa evidencia (Generation). Evita alucinaciones, permite actualizar el conocimiento sin re-entrenar el modelo y mantiene datos privados fuera del LLM. Componentes clave: vector database (Pinecone, Weaviate, ChromaDB), embeddings y el LLM.",
+ example:"Porvenir (fondo de pensiones colombiano) implementó RAG para su chatbot interno: los asesores preguntan 'cuál es el procedimiento para traslado de régimen según la circular 038 de 2023' y el sistema busca en 5.000 documentos normativos internos, recupera los párrafos relevantes y el LLM genera una respuesta citando la fuente exacta. Sin RAG, el LLM inventaría procedimientos que no existen.",
+ vs:[{title:"LLM sin RAG (solo memoria de entrenamiento)",body:"Responde desde su entrenamiento. Puede alucinar datos específicos. No sabe nada posterior a su corte de entrenamiento. No accede a documentos privados."},{title:"LLM + RAG (memoria aumentada)",body:"Busca en tu base de conocimiento antes de responder. Cita fuentes. Actualizable sin re-entrenar. Apropiado para datos confidenciales. Más complejo de implementar."}],
+ who:[{role:"ML Engineer",sen:"Sr",chip:"sen-sr"},{role:"Data Engineer (vectores)",sen:"Mid/Sr",chip:"sen-mid"},{role:"AI Architect",sen:"Sr/Lead",chip:"sen-sr"},{role:"Backend Engineer (IA)",sen:"Mid/Sr",chip:"sen-mid"}],
+ reg:["EU AI Act: RAG sobre documentos sensibles puede caer en categoría de alto riesgo si toma decisiones — requiere supervisión humana","CONPES: datos de entidades del Estado usados en RAG deben cumplir Ley 1712 de transparencia"],
+ quiz:{q:"¿Por qué RAG reduce las 'alucinaciones' de los LLMs en comparación con usarlos solos?",opts:["Porque RAG usa un LLM más grande y preciso","Porque RAG fuerza al LLM a basar su respuesta en documentos recuperados — si la respuesta no está en los documentos, el sistema puede indicarlo en lugar de inventar","Porque RAG desactiva la capacidad creativa del LLM","Porque RAG solo funciona con preguntas de sí/no, donde no hay espacio para inventar"],correct:1,exp:"Sin RAG, el LLM genera respuestas basándose en patrones estadísticos de su entrenamiento — puede 'inventar' datos específicos (cifras, fechas, nombres) con mucha confianza. Con RAG, el contexto de la respuesta viene de documentos reales recuperados. Si el dato no está en los documentos, un sistema RAG bien implementado lo admite en lugar de inventar."}},
+
+{id:17,title:"MLOps — ML en Producción",tag:"dev",tagLabel:"DevOps/MLOps",
+ analogy:"Como la diferencia entre hacer un prototipo de auto en el garage y fabricarlo en serie: el prototipo puede ser brillante, pero producirlo a escala, con control de calidad y mantenimiento, es un desafío completamente distinto.",
+ def:"MLOps (ML + DevOps) es el conjunto de prácticas para desplegar, monitorear y mantener modelos de ML en producción de forma confiable y reproducible. Incluye: versionado de modelos (MLflow), feature stores, pipelines de reentrenamiento, monitoreo de drift y A/B testing de modelos. Resuelve el 'last mile' del ML: el 90% del trabajo después de que el Data Scientist dice 'el modelo está listo'.",
+ example:"Bancolombia tiene 40+ modelos en producción: detección de fraude, scoring crediticio, churn, marketing. Sin MLOps: cada modelo es un siloingestionado manualmente por un ingeniero diferente. Con MLOps y MLflow: registro centralizado de modelos, pipelines automatizados de reentrenamiento semanal, alertas cuando el AUC cae más del 2% (model drift) y rollback automático al modelo anterior.",
+ vs:[{title:"Data Science sin MLOps",body:"El modelo vive en un Jupyter notebook. 'Funciona en mi máquina'. Despliegue manual. Nadie monitorea si sigue funcionando bien. 85% de modelos nunca llegan a producción."},{title:"MLOps maduro",body:"Modelos versionados, reproducibles, monitoreados. Reentrenamiento automático cuando baja la precisión. A/B testing entre versiones. El modelo es un activo empresarial mantenible."}],
+ who:[{role:"ML Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Data Scientist (senior)",sen:"Sr",chip:"sen-sr"},{role:"DataOps/Platform Engineer",sen:"Sr",chip:"sen-sr"}],
+ reg:["EU AI Act: modelos de IA de alto riesgo requieren monitoreo post-despliegue y plan de actuación cuando degradan — MLOps lo implementa (Art. 61)","CONPES 4023: buenas prácticas de MLOps recomendadas para modelos de IA en el sector público colombiano"],
+ quiz:{q:"¿Qué es el 'model drift' y por qué debe monitorearse?",opts:["Un error en el código del modelo que causa resultados incorrectos","La degradación del rendimiento del modelo cuando el mundo real cambia y los nuevos datos difieren del patrón de entrenamiento","Un bug en el pipeline de reentrenamiento del modelo","La diferencia entre el modelo en desarrollo y el modelo en producción"],correct:1,exp:"Model drift ocurre cuando la realidad cambia: el modelo de fraude entrenado en 2022 no reconoce los patrones de fraude de 2024. El comportamiento del consumidor cambia, aparecen nuevos tipos de transacciones, hay estacionalidades. Sin monitoreo de drift, el modelo sigue haciendo predicciones con confianza pero cada vez peores. El EU AI Act (Art. 61) exige detectar y actuar ante el drift en sistemas de alto riesgo."}},
+
+// CALIDAD
+{id:18,title:"Observabilidad & Calidad del Dato",tag:"cal",tagLabel:"Calidad",
+ analogy:"Como el tablero de instrumentos de un avión moderno: no esperas que el motor explote para saber que algo falla. Los sensores alertan con anticipación y el piloto puede actuar.",
+ def:"La observabilidad del dato monitorea activamente la salud de los datos con 5 métricas clave: Frescura (¿llegaron a tiempo?), Volumen (¿llegó la cantidad esperada?), Distribución (¿cambió el perfil estadístico?), Esquema (¿cambió la estructura?) y Linaje (¿cuál es el impacto de un problema aguas abajo?). Herramientas: Monte Carlo, Great Expectations, dbt tests, Soda Core, Anomalo.",
+ example:"Nu Colombia tiene SLAs de datos definidos: la tabla de transacciones debe actualizarse cada 15 minutos con ±5% del volumen esperado. Monte Carlo detecta en tiempo real si la tabla lleva 20 minutos sin actualizar o si el volumen de transacciones de Bogotá cayó 60% (puede ser un problema de pipeline, no una reducción real). Alerta llega a Slack antes de que el equipo de fraude note dashboards vacíos.",
+ vs:[{title:"Reactividad (sin observabilidad)",body:"Te enteras del problema cuando el dashboard está vacío, el modelo falla o el CEO pregunta. Daño ya causado. Confianza en el equipo de datos erosionada."},{title:"Observabilidad proactiva",body:"Alertas antes de que el usuario final note el problema. SLAs de datos definidos y medidos. El equipo de datos es percibido como confiable y proactivo."}],
+ who:[{role:"DataOps Engineer",sen:"Mid/Sr",chip:"sen-mid"},{role:"Analytics Engineer",sen:"Mid",chip:"sen-mid"},{role:"Data Engineer",sen:"Mid/Sr",chip:"sen-mid"}],
+ reg:["EU AI Act: monitoreo continuo requerido para sistemas de alto riesgo post-despliegue (Art. 61)","CONPES 4023: calidad y confiabilidad del dato como requisito para IA en el sector público colombiano"],
+ quiz:{q:"¿Qué indica un problema de 'distribución' en observabilidad de datos?",opts:["Que los datos llegaron tarde al pipeline","Que el perfil estadístico de los datos cambió significativamente — ej: la edad promedio de clientes pasó de 35 a 12 años de un día a otro","Que el volumen de datos cayó por debajo del umbral esperado","Que la tabla de datos cambió sus columnas inesperadamente"],correct:1,exp:"Un problema de distribución indica que los valores estadísticos del dato cambiaron dramáticamente: una columna que siempre tenía valores entre 0 y 100 ahora tiene valores de -9999 (código de error), o una columna de 'ciudad' que siempre tenía 'Bogotá, Medellín, Cali' ahora tiene valores vacíos al 80%. Puede indicar un bug upstream o un cambio en la fuente de datos."}},
+];
+
+const LEG_CONCEPTS = [
+{id:'l1',title:"Riesgo Inaceptable — EU AI Act (Art. 5)",tag:"leg",tagLabel:"Legislación",
+ analogy:"Como jugar con fuego en una gasolinera: directamente prohibido, sin excepciones ni justificaciones.",
+ def:"La categoría más alta del EU AI Act: sistemas completamente prohibidos en la UE porque atentan contra derechos fundamentales. Lista cerrada (Art. 5): (1) manipulación subliminal del comportamiento, (2) explotación de vulnerabilidades de grupos específicos, (3) scoring social ciudadano por autoridades públicas, (4) inferencia de emociones en trabajo/educación, (5) clasificación biométrica basada en características sensibles, (6) identificación biométrica en tiempo real en espacios públicos (salvo excepciones terrorismo).",
+ example:"Una empresa de RR.HH. que quisiera vender en Madrid un sistema de 'análisis de emociones faciales' para entrevistas de trabajo — prohibido por Art. 5.1(f). Misma empresa operando solo en Colombia: no existe aún prohibición equivalente. Vacío regulatorio que el CONPES no cubre.",
+ vs:[{title:"EU AI Act (prohibición explícita)",body:"Lista cerrada de prácticas prohibidas. Multa de hasta €35M o 7% ingresos globales. Vigente desde agosto 2024."},{title:"CONPES Colombia",body:"No define categorías de prohibición. Sin enforcement. La empresa decide sus estándares. Vacío regulatorio significativo para casos extremos."}],
+ who:[{role:"Legal Counsel / DPO",sen:"Sr/Lead",chip:"sen-sr"},{role:"AI Ethics Lead",sen:"Sr",chip:"sen-sr"},{role:"Compliance Officer",sen:"Mid/Sr",chip:"sen-mid"}],
+ reg:["EU AI Act: Art. 5 — lista exhaustiva de prácticas de IA prohibidas, vigente 6 meses tras entrada en vigor","CONPES 3975/4023: no tiene equivalente — foco en adopción, no en prohibición"],
+ quiz:{q:"¿Un sistema de IA que detecta emociones en estudiantes durante clases virtuales para medir 'engagement' es legal en la UE?",opts:["Sí, si el colegio tiene consentimiento de los padres","Sí, si el sistema tiene al menos un 90% de precisión","No, está explícitamente prohibido por el EU AI Act en contextos educativos independientemente del consentimiento","Solo está prohibido si los estudiantes son menores de 14 años"],correct:2,exp:"El Art. 5.1(f) del EU AI Act prohíbe explícitamente los sistemas de IA que infieran emociones de personas en contextos educativos y laborales, independientemente del consentimiento. La razón: el desequilibrio de poder hace que el consentimiento no sea libre y la práctica atenta contra la dignidad. No hay excepciones ni umbrales de precisión que lo justifiquen."}},
+
+{id:'l2',title:"Riesgo Alto — EU AI Act (Art. 6-49)",tag:"leg",tagLabel:"Legislación",
+ analogy:"Como conducir un camión cisterna de combustible: permitido, pero necesitas licencia especial, inspecciones periódicas, ruta aprobada y registro obligatorio antes de salir.",
+ def:"Sistemas permitidos pero sujetos a obligaciones estrictas antes del despliegue: evaluación de conformidad, registro en base de datos EU, documentación técnica exhaustiva, datos de entrenamiento de calidad con linaje, supervisión humana obligatoria en decisiones y monitoreo post-mercado continuo. Aplica a IA en: infraestructura crítica, educación, empleo, servicios esenciales (crédito, seguros), aplicación de ley, migración y justicia.",
+ example:"Una fintech colombiana como Addi que opera en España: su sistema de IA para aprobar/rechazar créditos es de alto riesgo. Antes de desplegarlo en la UE debe: registrarse en la base EU, documentar sus datos de entrenamiento, demostrar que no discrimina por origen étnico, garantizar revisión humana en rechazos y tener plan de monitoreo post-lanzamiento. Costo estimado de cumplimiento: €50.000–200.000.",
+ vs:[{title:"Cumplimiento EU AI Act (alto riesgo)",body:"Inversión en documentación, auditorías, registro EU. Acceso a mercado de 450M de consumidores. Ventaja competitiva vs competidores no certificados."},{title:"No cumplimiento",body:"Multa hasta €15M o 3% ingresos globales por incumplimiento de requisitos de alto riesgo (menor que inaceptable). Exclusión del mercado europeo. Daño reputacional."}],
+ who:[{role:"AI Product Manager",sen:"Sr",chip:"sen-sr"},{role:"DPO / Legal AI",sen:"Mid/Sr",chip:"sen-mid"},{role:"ML Engineer (compliance)",sen:"Sr",chip:"sen-sr"},{role:"Auditor de IA",sen:"Sr/Lead",chip:"sen-sr"}],
+ reg:["EU AI Act: Cap. 2, Art. 6-49 — requisitos completos para sistemas de alto riesgo, obligatorios desde agosto 2026","CONPES 4023: recomienda revisión humana en decisiones de política pública con IA — sin mecanismo de enforcement ni multas"],
+ quiz:{q:"Una empresa colombiana que vende software de selección de personal con IA quiere expandirse a Alemania. ¿Qué implica el EU AI Act?",opts:["Nada — el EU AI Act solo aplica a empresas europeas","Debe cumplir todos los requisitos de alto riesgo para sistemas de IA en empleo: evaluación de conformidad, documentación técnica, datos sin sesgo y registro en la base EU antes de comercializarlo","Solo debe registrarse en la base EU — el resto es voluntario","Debe esperar a que Colombia firme un acuerdo bilateral con la UE sobre IA"],correct:1,exp:"El EU AI Act tiene aplicación extraterritorial: aplica a cualquier empresa (colombiana, estadounidense, china) que coloque sistemas de IA en el mercado europeo o cuyos outputs afecten a personas en la UE. Los sistemas de selección de personal con IA están explícitamente en la lista de alto riesgo (Anexo III). El incumplimiento implica hasta €15M o 3% de ingresos globales."}},
+];
+
+const PROFILES = [
+{id:'de',name:"Data Engineer",sub:"Ingeniería de Datos",
+ col:"rgba(0,212,170,0.15)",tc:"#00d4aa",ini:"DE",
+ desc:"Construye y mantiene la infraestructura de datos: pipelines, arquitecturas (Lake/DW/Lakehouse), integraciones entre sistemas y automatizaciones. Es el 'fontanero' del ecosistema — sin él, los datos no llegan a ningún lado ni en las condiciones correctas.",
+ levels:[
+  {s:"Junior",e:"0–2 años",sal:"$4–7M",tasks:"ETL básico, SQL avanzado, mantenimiento de pipelines existentes, scripting Python, Airflow básico"},
+  {s:"Mid",e:"2–4 años",sal:"$8–14M",tasks:"Diseño de pipelines complejos, dbt, CI/CD, Spark básico, optimización de queries, cloud (AWS/GCP/Azure)"},
+  {s:"Senior",e:"4–7 años",sal:"$15–25M",tasks:"Arquitectura de plataformas de datos, Kafka/streaming, decisiones de stack, mentoring, DataOps"},
+  {s:"Lead/Staff",e:"7+ años",sal:"$26–40M+",tasks:"Estrategia técnica de plataforma, estándares de ingeniería, roadmap, liderazgo de equipo, FinOps"},
+ ],
+ tools:["Python","SQL","Apache Airflow","dbt","Apache Spark","Kafka","Docker","Kubernetes","Terraform","BigQuery","Snowflake","Delta Lake"]},
+
+{id:'da',name:"Data Analyst",sub:"Análisis & Business Intelligence",
+ col:"rgba(0,153,204,0.15)",tc:"#0099cc",ini:"DA",
+ desc:"Transforma datos en insights accionables para el negocio. Responde '¿por qué cayeron las ventas?' y '¿qué debería hacer el negocio?'. El puente más directo entre los datos y las decisiones de negocio. Perfil con mayor demanda en Colombia.",
+ levels:[
+  {s:"Junior",e:"0–2 años",sal:"$3–5.5M",tasks:"Dashboards en Power BI/Tableau, SQL, Excel avanzado, reportes recurrentes, limpieza de datos"},
+  {s:"Mid",e:"2–4 años",sal:"$6–11M",tasks:"Análisis exploratorio, A/B testing básico, Python/R, métricas de negocio, storytelling con datos"},
+  {s:"Senior",e:"4–7 años",sal:"$12–19M",tasks:"Análisis estadístico complejo, modelos de forecasting, definición de KPIs, mentoría, relación con stakeholders"},
+  {s:"Lead",e:"7+ años",sal:"$20–30M+",tasks:"Estrategia analítica, definición de OKRs de datos, relación con C-suite, cultura data-driven"},
+ ],
+ tools:["SQL","Power BI","Tableau","Looker","Python","R","Excel","dbt","Google Analytics","Mixpanel"]},
+
+{id:'ds',name:"Data Scientist",sub:"Ciencia de Datos & ML",
+ col:"rgba(167,139,250,0.15)",tc:"#a78bfa",ini:"DS",
+ desc:"Desarrolla modelos estadísticos y de ML para predecir, clasificar o descubrir patrones en los datos. Combina matemáticas, programación y entendimiento de negocio. Trabaja sobre datos que el Data Engineer ya preparó.",
+ levels:[
+  {s:"Junior",e:"0–2 años",sal:"$5–8M",tasks:"EDA, modelos supervisados básicos (scikit-learn), visualizaciones, comunicación de resultados"},
+  {s:"Mid",e:"2–4 años",sal:"$9–16M",tasks:"NLP, series de tiempo, feature engineering, A/B testing riguroso, despliegue básico (Streamlit/FastAPI)"},
+  {s:"Senior",e:"4–7 años",sal:"$17–28M",tasks:"Arquitecturas ML complejas, LLMs, causalidad, investigación aplicada, definición de casos de uso"},
+  {s:"Lead/Principal",e:"7+ años",sal:"$29–45M+",tasks:"Dirección de investigación, estrategia de ML/IA, publicaciones, roadmap de IA de la organización"},
+ ],
+ tools:["Python","PyTorch","TensorFlow","scikit-learn","MLflow","Hugging Face","SQL","Spark","R","Jupyter"]},
+
+{id:'mle',name:"ML Engineer",sub:"Ingeniería de ML & MLOps",
+ col:"rgba(245,158,11,0.15)",tc:"#f59e0b",ini:"MLE",
+ desc:"Lleva los modelos del Data Scientist a producción y los mantiene funcionando. Si el DS 'inventa' el modelo, el MLE lo industrializa. Rol con mayor crecimiento salarial en Colombia 2023-2024. Demanda > oferta.",
+ levels:[
+  {s:"Junior",e:"1–3 años",sal:"$6–10M",tasks:"Servir modelos con FastAPI/Flask, monitoreo básico, containerización Docker, CI/CD básico"},
+  {s:"Mid",e:"3–5 años",sal:"$11–20M",tasks:"MLOps completo, Kubernetes, feature stores, reentrenamiento automático, A/B testing de modelos"},
+  {s:"Senior",e:"5–8 años",sal:"$21–35M",tasks:"Plataformas ML end-to-end, LLMOps, RAG en producción, arquitectura de feature engineering a escala"},
+  {s:"Lead",e:"8+ años",sal:"$36–55M+",tasks:"Estrategia MLOps, plataforma ML de la organización, evaluación de proveedores, estándares de ML en producción"},
+ ],
+ tools:["Python","Docker","Kubernetes","MLflow","Airflow","FastAPI","Terraform","Ray","Triton","LangChain","Weights & Biases"]},
+
+{id:'dops',name:"DataOps / Platform Engineer",sub:"Operaciones & Plataforma de Datos",
+ col:"rgba(52,211,153,0.15)",tc:"#34d399",ini:"DO",
+ desc:"Garantiza que la infraestructura de datos funcione de forma confiable, segura y eficiente en costos. Implementa CI/CD, monitoreo y observabilidad. El DevOps especializado en el mundo de los datos.",
+ levels:[
+  {s:"Junior",e:"0–2 años",sal:"$4–7M",tasks:"Automatización de tareas, monitoreo básico, scripts de infraestructura, soporte a pipelines"},
+  {s:"Mid",e:"2–5 años",sal:"$8–15M",tasks:"CI/CD para datos, IaC con Terraform, observabilidad (Monte Carlo, Great Expectations), gestión de costos cloud"},
+  {s:"Senior",e:"5–8 años",sal:"$16–27M",tasks:"Arquitectura de plataforma de datos, seguridad, multi-cloud, DataOps culture, SLAs de datos"},
+  {s:"Lead",e:"8+ años",sal:"$28–42M+",tasks:"Estrategia de plataforma, roadmap técnico, FinOps, estándares de ingeniería, gobierno de costos cloud"},
+ ],
+ tools:["Terraform","Docker","Kubernetes","GitHub Actions","Apache Airflow","Grafana","dbt","Monte Carlo","Great Expectations","Soda"]},
+
+{id:'cdo',name:"Chief Data Officer (CDO)",sub:"Liderazgo Estratégico de Datos",
+ col:"rgba(251,191,36,0.15)",tc:"#fbbf24",ini:"CDO",
+ desc:"Responsable ejecutivo de la estrategia de datos e IA de la organización. Define la visión, asegura el presupuesto y lidera la transformación data-driven. Perfil emergente en Colombia — pocas empresas lo tienen, las que sí lo tienen ganan ventaja competitiva.",
+ levels:[
+  {s:"Head of Data",e:"6–10 años",sal:"$30–50M",tasks:"Liderar equipo de datos, estrategia analítica, relación con negocio, roadmap de datos"},
+  {s:"VP / Director",e:"10–15 años",sal:"$50–80M",tasks:"Presupuesto del área, política de datos, cumplimiento regulatorio, cultura data-driven en toda la org"},
+  {s:"CDO / CAIO",e:"15+ años",sal:"$80–150M+",tasks:"Estrategia de IA y datos al nivel de junta directiva, monetización del dato, transformación digital"},
+ ],
+ tools:["Collibra","Tableau/Power BI","Governance frameworks","OKRs","Budget management","GDPR/AI Act compliance","Executive communication"]},
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let S = {mastery:{}, qOk:0, streak:1, section:'fichas', filter:'all'};
+try {
+  const sv = localStorage.getItem('dsh_v3');
+  if(sv) S = {...S, ...JSON.parse(sv)};
+} catch(e) {}
+const save = () => { try { localStorage.setItem('dsh_v3', JSON.stringify(S)); } catch(e) {} };
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+const allC = () => [...CONCEPTS, ...LEG_CONCEPTS];
+const tagMap = {
+  arq:{l:"Arquitectura",c:"tag-arq"}, pipe:{l:"Pipelines",c:"tag-pipe"},
+  dev:{l:"DevOps/MLOps",c:"tag-dev"}, cal:{l:"Calidad",c:"tag-cal"},
+  big:{l:"Big Data",c:"tag-big"}, cloud:{l:"Cloud",c:"tag-cloud"},
+  gov:{l:"Gobernanza",c:"tag-gov"}, ia:{l:"IA / LLMs",c:"tag-ia"},
+  leg:{l:"Legislación",c:"tag-leg"}, dato:{l:"Ciclo del Dato",c:"tag-dato"}
+};
+
+function updateStats() {
+  const all = allC();
+  const dom = Object.values(S.mastery).filter(v => v >= 3).length;
+  document.getElementById('st').textContent = all.length;
+  document.getElementById('sl').textContent = dom;
+  document.getElementById('sq').textContent = S.qOk;
+  document.getElementById('ss').textContent = S.streak;
+  document.getElementById('snum').textContent = S.streak;
+  if(document.getElementById('snum2')) document.getElementById('snum2').textContent = S.streak;
+  const pct = all.length ? Math.round(dom / all.length * 100) : 0;
+  document.getElementById('pfill').style.width = pct + '%';
+  document.getElementById('ppct').textContent = pct + '%';
+  document.getElementById('plbl').textContent = dom + ' de ' + all.length + ' conceptos dominados';
+  document.getElementById('prog-mini').textContent = pct + '% dominado';
+}
+
+function renderFilters() {
+  const tags = {};
+  CONCEPTS.forEach(c => { tags[c.tag] = tagMap[c.tag]?.l || c.tagLabel; });
+  let h = '<button class="fchip ' + (S.filter === 'all' ? 'on' : '') + '" onclick="setFilter(\'all\')">Todos</button>';
+  Object.entries(tags).forEach(([t, l]) => {
+    h += '<button class="fchip ' + (S.filter === t ? 'on' : '') + '" onclick="setFilter(\'' + t + '\')">' + l + '</button>';
+  });
+  document.getElementById('frow').innerHTML = h;
+}
+
+function setFilter(f) {
+  S.filter = f; save(); renderFilters(); renderCards();
+}
+
+function quickFilter(f) {
+  showSection('fichas');
+  setFilter(f);
+}
+
+function whoHtml(who) {
+  if (!who || !who.length) return '';
+  return '<div class="who-box"><div class="who-t">¿Quién trabaja con esto?</div><div class="who-row">' +
+    who.map(w => '<span class="who-chip ' + w.chip + '">' + w.role + ' · ' + w.sen + '</span>').join('') +
+    '</div></div>';
+}
+
+function vsHtml(vs) {
+  if (!vs || !vs.length) return '';
+  return '<div class="sec-label">Comparativa</div><div class="vs-grid">' +
+    vs.map(v => '<div class="vs-card"><div class="vs-t">' + v.title + '</div><div class="vs-b">' + v.body + '</div></div>').join('') +
+    '</div>';
+}
+
+function renderCard(c) {
+  const m = S.mastery[c.id] || 0;
+  const ti = tagMap[c.tag] || {l: c.tagLabel, c: 'tag-dato'};
+  const dots = [0,1,2].map(i =>
+    '<span class="dot ' + (m > i ? 'filled' : '') + '" onclick="setMastery(\'' + c.id + '\',' + (i+1) + ')" title="Nivel ' + (i+1) + '"></span>'
+  ).join('');
+  const reg = (c.reg || []).map(r =>
+    '<span class="reg-chip ' + (r.startsWith('EU') ? 'chip-eu' : 'chip-co') + '">' + r + '</span>'
+  ).join('');
+  return `<div class="card" id="card-${c.id}">
+    <div class="card-head">
+      <div class="c-title">${c.title}</div>
+      <span class="c-tag ${ti.c}">${ti.l}</span>
+    </div>
+    <div class="analogy">${c.analogy}</div>
+    <div class="c-def">${c.def}</div>
+    <div class="sec-label">Ejemplo colombiano / latinoamericano</div>
+    <div class="c-example">${c.example}</div>
+    ${vsHtml(c.vs)}
+    ${whoHtml(c.who)}
+    ${reg ? '<div class="reg-tags">' + reg + '</div>' : ''}
+    <div class="card-footer">
+      <div class="mastery-wrap">${dots}<span class="m-lbl">${['No visto','Visto','Casi','Dominado'][m]}</span></div>
+      <button class="quiz-btn" onclick="toggleQuiz('${c.id}')">Quiz ▶</button>
+    </div>
+    <div class="quiz-panel" id="quiz-${c.id}">
+      <div class="quiz-q">${c.quiz.q}</div>
+      <div class="quiz-opts">
+        ${c.quiz.opts.map((o,i) => `<button class="qopt" id="qo-${c.id}-${i}" onclick="answer('${c.id}',${i})">${o}</button>`).join('')}
+      </div>
+      <div class="qfb" id="qf-${c.id}"></div>
+    </div>
+  </div>`;
+}
+
+function renderCards() {
+  const q = (document.getElementById('srch')?.value || '').toLowerCase();
+  let list = CONCEPTS;
+  if (S.filter !== 'all') list = list.filter(c => c.tag === S.filter);
+  if (q) list = list.filter(c =>
+    c.title.toLowerCase().includes(q) ||
+    c.def.toLowerCase().includes(q) ||
+    (c.who || []).some(w => w.role.toLowerCase().includes(q))
+  );
+  const el = document.getElementById('cards-container');
+  el.innerHTML = list.length ? list.map(c => renderCard(c)).join('') : '<div class="empty">No hay conceptos que coincidan.</div>';
+}
+
+function renderLegCards() {
+  document.getElementById('leg-cards-container').innerHTML = LEG_CONCEPTS.map(c => renderCard(c)).join('');
+}
+
+function renderProfiles() {
+  document.getElementById('prof-grid').innerHTML = PROFILES.map(p => `
+    <div class="prof-card">
+      <div class="prof-head">
+        <div class="prof-avatar" style="background:${p.col};color:${p.tc}">${p.ini}</div>
+        <div><div class="prof-name">${p.name}</div><div class="prof-sub">${p.sub}</div></div>
+      </div>
+      <div class="prof-desc">${p.desc}</div>
+      <table class="sen-table">
+        <tr><th>Nivel</th><th>Tareas clave</th><th>Salario ref. (COP/mes)</th></tr>
+        ${p.levels.map(l => `<tr>
+          <td style="font-weight:500;white-space:nowrap">${l.s}<br><span style="font-weight:400;color:var(--text3);font-size:10px">${l.e}</span></td>
+          <td class="task-col">${l.tasks}</td>
+          <td class="sal-col">${l.sal}</td>
+        </tr>`).join('')}
+      </table>
+      <div style="margin-top:.75rem"><div class="who-t" style="margin-bottom:5px">Stack tecnológico</div>
+      <div class="tools-wrap">${p.tools.map(t => '<span class="tool-tag">' + t + '</span>').join('')}</div></div>
+    </div>`).join('');
+}
+
+function setMastery(id, level) {
+  const cur = S.mastery[id] || 0;
+  S.mastery[id] = cur === level ? level - 1 : level;
+  save(); updateStats();
+  const card = document.getElementById('card-' + id);
+  if(card) {
+    const dots = card.querySelectorAll('.dot');
+    dots.forEach((d, i) => d.classList.toggle('filled', S.mastery[id] > i));
+    card.querySelector('.m-lbl').textContent = ['No visto','Visto','Casi','Dominado'][S.mastery[id]];
+  }
+}
+
+function toggleQuiz(id) {
+  const p = document.getElementById('quiz-' + id);
+  if (p) p.style.display = p.style.display === 'block' ? 'none' : 'block';
+}
+
+function answer(cid, chosen) {
+  const c = allC().find(x => String(x.id) === String(cid));
+  if (!c) return;
+  document.querySelectorAll('[id^="qo-' + cid + '-"]').forEach((b, i) => {
+    b.disabled = true;
+    if (i === c.quiz.correct) b.classList.add('correct');
+    else if (i === chosen && chosen !== c.quiz.correct) b.classList.add('wrong');
+  });
+  const ok = chosen === c.quiz.correct;
+  if (ok) { S.qOk++; if ((S.mastery[cid] || 0) < 3) S.mastery[cid] = Math.min(3, (S.mastery[cid] || 0) + 1); }
+  save(); updateStats();
+  const fb = document.getElementById('qf-' + cid);
+  fb.className = 'qfb ' + (ok ? 'fb-ok' : 'fb-bad');
+  fb.style.display = 'block';
+  fb.textContent = (ok ? '✓ Correcto. ' : '✗ Incorrecto. ') + c.quiz.exp;
+}
+
+function showSection(s) {
+  ['fichas','perfiles','legislacion','aigen'].forEach(x => {
+    const el = document.getElementById('sec-' + x);
+    if(el) el.style.display = x === s ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mob-tab').forEach((b, i) => {
+    b.classList.toggle('active', ['fichas','perfiles','legislacion','aigen'][i] === s);
+  });
+  const navBtns = document.querySelectorAll('.nav-btn');
+  const idx = ['fichas','perfiles','legislacion','aigen'].indexOf(s);
+  if(navBtns[idx]) navBtns[idx].classList.add('active');
+  S.section = s; save();
+}
+
+function setAI(v) {
+  document.getElementById('aiinput').value = v;
+  generateCard();
+}
+
+async function generateCard() {
+  const term = document.getElementById('aiinput').value.trim();
+  if (!term) return;
+  const res = document.getElementById('aires');
+  res.innerHTML = '<div class="card" style="text-align:center;padding:2.5rem"><div class="loading-dots"><span></span><span></span><span></span></div><p style="margin-top:12px;font-size:13px;color:var(--text3)">Generando ficha para "' + term + '"...</p></div>';
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        system: `Eres experto en datos, ingeniería de datos, Big Data, cloud, DevOps/MLOps, IA/LLMs y legislación (EU AI Act, CONPES Colombia). Genera fichas de estudio claras para perfiles intermedios que conocen la jerga técnica. Responde SOLO con JSON válido, sin markdown, sin backticks, sin texto adicional. Estructura exacta:
+{"title":"nombre del concepto","tag":"arq|pipe|dev|cal|big|cloud|gov|ia|leg|dato","tagLabel":"Arquitectura|Pipelines|DevOps/MLOps|Calidad|Big Data|Cloud|Gobernanza|IA / LLMs|Legislación|Ciclo del Dato",
+"analogy":"analogía cotidiana en 1 oración memorable",
+"def":"definición técnica clara con herramientas reales y números concretos cuando aplique, 2-3 oraciones",
+"example":"ejemplo concreto de empresa colombiana o latinoamericana real, 2-3 oraciones con datos concretos",
+"vs":[{"title":"Opción A o contexto 1","body":"descripción concisa con ventajas/desventajas"},{"title":"Opción B o contexto 2","body":"descripción concisa"}],
+"who":[{"role":"Perfil específico que usa esto","sen":"Jr|Mid|Sr|Sr/Lead|Lead","chip":"sen-jr|sen-mid|sen-sr|sen-lead"}],
+"reg":["Relación con EU AI Act en 1 línea concreta (artículo si aplica)","Relación con CONPES Colombia en 1 línea concreta"],
+"quiz":{"q":"pregunta de opción múltiple que test comprensión profunda, no memorización","opts":["A","B","C","D"],"correct":0,"exp":"explicación de 2-3 oraciones de por qué la respuesta es correcta y por qué las otras no"}}`,
+        messages: [{role: 'user', content: 'Genera ficha completa para el concepto: ' + term}]
+      })
+    });
+    const data = await r.json();
+    const text = data.content.map(x => x.text || '').join('');
+    const card = JSON.parse(text.replace(/```json|```/g, '').trim());
+    card.id = 'gen-' + Date.now();
+    res.innerHTML = renderCard(card);
+  } catch(e) {
+    res.innerHTML = '<div class="card"><p style="font-size:13px;color:var(--text2)">No se pudo generar la ficha. Verifica la conexión e intenta de nuevo.</p></div>';
+  }
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+renderFilters();
+renderCards();
+renderLegCards();
+renderProfiles();
+updateStats();
+if (S.section && S.section !== 'fichas') showSection(S.section);
+</script>
+</body>
+</html>
